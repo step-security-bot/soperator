@@ -20,22 +20,47 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
-// NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
-
 // SlurmClusterSpec defines the desired state of SlurmCluster
 type SlurmClusterSpec struct {
-	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
-
-	// Foo is an example field of SlurmCluster. Edit slurmcluster_types.go to remove/update
-	Foo string `json:"foo,omitempty"`
+	// ControllerNode defines the desired state of SlurmCluster controller nodes
+	// kubebuilder:validation:Required
+	ControllerNode ControllerNodeSpec `json:"controllerNode"`
 }
+
+// ControllerNodeSpec defines the desired state of SlurmCluster controller nodes
+type ControllerNodeSpec struct {
+	// Size defines the number of controller node instances
+	// TODO remove maximum when we're ready for it
+	// +kubebuilder:default=1
+	// +kubebuilder:validation:Minimum=1
+	// +kubebuilder:validation:Maximum=1
+	// +kubebuilder:validation:ExclusiveMinimum=false
+	// +kubebuilder:validation:ExclusiveMaximum=false
+	Size int32 `json:"size,omitempty"`
+
+	// Image defines the image used for controller node
+	Image *ImageSpec `json:"image,omitempty"`
+
+	// Pod defines the spec for controller pods
+	Pod *PodSpec `json:"pod,omitempty"`
+}
+
+const (
+	ConditionClusterControllersAvailable = "ControllersAvailable"
+	ConditionClusterWorkersAvailable     = "WorkersAvailable"
+
+	PhaseClusterReconciling  = "Reconciling"
+	PhaseClusterNotAvailable = "Not available"
+	PhaseClusterAvailable    = "Available"
+)
 
 // SlurmClusterStatus defines the observed state of SlurmCluster
 type SlurmClusterStatus struct {
-	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
+	// +optional
+	Conditions []metav1.Condition `json:"conditions,omitempty"`
+
+	// +optional
+	Phase *string `json:"phase,omitempty"`
 }
 
 //+kubebuilder:object:root=true
