@@ -31,8 +31,10 @@ spec:
                   image:
                     properties:
                       repository:
+                        default: cr.nemax.nebius.cloud/crnonjecps8pifr7am4i/controller
                         type: string
                       tag:
+                        default: latest
                         type: string
                     required:
                     - repository
