@@ -1,6 +1,8 @@
 package values
 
 import (
+	"github.com/go-logr/logr"
+
 	slurmv1 "nebius.ai/slurm-operator/api/v1"
 )
 
@@ -8,6 +10,6 @@ import (
 // TODO database configuration
 type SlurmDatabase struct{}
 
-func buildSlurmDatabaseFrom(_ *slurmv1.SlurmCluster) SlurmDatabase {
-	return SlurmDatabase{}
+func buildSlurmDatabaseFrom(_ logr.Logger, _ *slurmv1.SlurmCluster) (SlurmDatabase, error) {
+	return SlurmDatabase{}, nil
 }

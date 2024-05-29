@@ -1,6 +1,8 @@
 package values
 
 import (
+	"github.com/go-logr/logr"
+
 	slurmv1 "nebius.ai/slurm-operator/api/v1"
 )
 
@@ -8,6 +10,6 @@ import (
 // TODO workers reconciliation
 type SlurmWorker struct{}
 
-func buildSlurmWorkerFrom(_ *slurmv1.SlurmCluster) SlurmWorker {
-	return SlurmWorker{}
+func buildSlurmWorkerFrom(_ logr.Logger, _ *slurmv1.SlurmCluster) (SlurmWorker, error) {
+	return SlurmWorker{}, nil
 }
