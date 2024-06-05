@@ -200,6 +200,11 @@ type SlurmNodeWorker struct {
 	// +kubebuilder:validation:Required
 	Slurmd NodeContainer `json:"slurmd"`
 
+	// Munge represents the Slurm munge configuration
+	//
+	// +kubebuilder:validation:Required
+	Munge NodeContainer `json:"munge"`
+
 	// Volumes represents the volume configurations for the worker node
 	//
 	// +kubebuilder:validation:Required

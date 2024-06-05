@@ -13,14 +13,14 @@ import (
 )
 
 // renderContainerSlurmctld renders Slurm controller [corev1.Container] for slurmctld
-func renderContainerSlurmctld(cluster *values.SlurmCluster) corev1.Container {
+func renderContainerSlurmctld(container *values.Container) corev1.Container {
 	return corev1.Container{
-		Name:            consts.ContainerSlurmctldName,
-		Image:           cluster.NodeController.ContainerSlurmctld.Image,
+		Name:            consts.ContainerNameSlurmctld,
+		Image:           container.Image,
 		ImagePullPolicy: corev1.PullAlways, // TODO use digest and set to corev1.PullIfNotPresent
 		Ports: []corev1.ContainerPort{{
-			Name:          consts.ContainerSlurmctldName,
-			ContainerPort: cluster.NodeController.ContainerSlurmctld.Port,
+			Name:          consts.ContainerNameSlurmctld,
+			ContainerPort: container.Port,
 			Protocol:      corev1.ProtocolTCP,
 		}},
 		VolumeMounts: []corev1.VolumeMount{
@@ -32,7 +32,7 @@ func renderContainerSlurmctld(cluster *values.SlurmCluster) corev1.Container {
 		ReadinessProbe: &corev1.Probe{
 			ProbeHandler: corev1.ProbeHandler{
 				TCPSocket: &corev1.TCPSocketAction{
-					Port: intstr.FromInt32(cluster.NodeController.ContainerSlurmctld.Port),
+					Port: intstr.FromInt32(container.Port),
 				},
 			},
 		},
@@ -45,19 +45,19 @@ func renderContainerSlurmctld(cluster *values.SlurmCluster) corev1.Container {
 		},
 		Resources: corev1.ResourceRequirements{
 			Limits: corev1.ResourceList{
-				corev1.ResourceCPU:              cluster.NodeController.ContainerSlurmctld.Resources.CPU,
-				corev1.ResourceMemory:           cluster.NodeController.ContainerSlurmctld.Resources.Memory,
-				corev1.ResourceEphemeralStorage: cluster.NodeController.ContainerSlurmctld.Resources.EphemeralStorage,
+				corev1.ResourceCPU:              container.Resources.CPU,
+				corev1.ResourceMemory:           container.Resources.Memory,
+				corev1.ResourceEphemeralStorage: container.Resources.EphemeralStorage,
 			},
 		},
 	}
 }
 
 // renderContainerMunge renders Slurm controller [corev1.Container] for munge
-func renderContainerMunge(cluster *values.SlurmCluster) corev1.Container {
+func renderContainerMunge(container *values.Container) corev1.Container {
 	return corev1.Container{
-		Name:            consts.ContainerMungeName,
-		Image:           cluster.NodeController.ContainerMunge.Image,
+		Name:            consts.ContainerNameMunge,
+		Image:           container.Image,
 		ImagePullPolicy: corev1.PullAlways, // TODO use digest and set to corev1.PullIfNotPresent
 		VolumeMounts: []corev1.VolumeMount{
 			common.RenderVolumeMountMungeKey(),
@@ -85,9 +85,9 @@ func renderContainerMunge(cluster *values.SlurmCluster) corev1.Container {
 				}}},
 		Resources: corev1.ResourceRequirements{
 			Limits: corev1.ResourceList{
-				corev1.ResourceCPU:              cluster.NodeController.ContainerSlurmctld.Resources.CPU,
-				corev1.ResourceMemory:           cluster.NodeController.ContainerSlurmctld.Resources.Memory,
-				corev1.ResourceEphemeralStorage: cluster.NodeController.ContainerSlurmctld.Resources.EphemeralStorage,
+				corev1.ResourceCPU:              container.Resources.CPU,
+				corev1.ResourceMemory:           container.Resources.Memory,
+				corev1.ResourceEphemeralStorage: container.Resources.EphemeralStorage,
 			},
 		},
 	}

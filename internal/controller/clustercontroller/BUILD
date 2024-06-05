@@ -17,6 +17,7 @@ go_library(
         "//msp/slurm-service/internal/operator/api/v1:api",
         "//msp/slurm-service/internal/operator/internal/consts",
         "//msp/slurm-service/internal/operator/internal/controller/reconciler",
+        "//msp/slurm-service/internal/operator/internal/naming",
         "//msp/slurm-service/internal/operator/internal/render/common",
         "//msp/slurm-service/internal/operator/internal/render/controller",
         "//msp/slurm-service/internal/operator/internal/values",
