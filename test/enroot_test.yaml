@@ -1,0 +1,60 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  namespace: default
+  name: enroot-test-1
+spec:
+  containers:
+    - name: ubuntu
+      image: "ubuntu:focal"
+      imagePullPolicy: IfNotPresent
+      command: ["bin/bash", "-c", "sleep infinity"]
+      resources:
+        limits:
+          nvidia.com/gpu: "1"
+      volumeMounts:
+        - name: boot
+          mountPath: /boot
+          mountPropagation: HostToContainer
+        - name: proc
+          mountPath: /proc
+        - name: dev
+          mountPath: /dev
+        - name: sys
+          mountPath: /sys
+      securityContext:
+        privileged: true
+        seccompProfile:
+          type: Unconfined
+  volumes:
+    - name: boot
+      hostPath:
+        path: /boot
+        type: ''
+    - name: proc
+      hostPath:
+        path: /proc
+        type: ''
+    - name: dev
+      hostPath:
+        path: /dev
+        type: ''
+    - name: sys
+      hostPath:
+        path: /sys
+        type: ''
+  tolerations:
+    # Allow scheduling on GPU nodes
+    - key: nvidia.com/gpu
+      operator: Exists
+      effect: NoSchedule
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          # Require scheduling on nodes from the a100-node-group
+          - matchExpressions:
+              - key: nebius.com/node-group-id
+                operator: In
+                values:
+                  - "f2m3qsrqa74ugs37saab"
