@@ -119,6 +119,8 @@ func (c *SlurmCluster) Validate(ctx context.Context) error {
 		}
 	}
 
+	// TODO validate worker
+
 	// Secrets
 	// TODO login node
 	{
