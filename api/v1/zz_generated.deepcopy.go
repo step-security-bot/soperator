@@ -387,6 +387,7 @@ func (in *SlurmNodeWorker) DeepCopyInto(out *SlurmNodeWorker) {
 	*out = *in
 	out.SlurmNode = in.SlurmNode
 	in.Slurmd.DeepCopyInto(&out.Slurmd)
+	in.Munge.DeepCopyInto(&out.Munge)
 	in.Volumes.DeepCopyInto(&out.Volumes)
 }
 

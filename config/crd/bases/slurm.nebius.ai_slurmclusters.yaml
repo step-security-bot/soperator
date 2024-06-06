@@ -1037,6 +1037,44 @@ spec:
                     properties:
                       k8sNodeFilterName:
                         type: string
+                      maxGpu:
+                        format: int32
+                        type: integer
+                      munge:
+                        properties:
+                          image:
+                            type: string
+                          port:
+                            format: int32
+                            type: integer
+                          resources:
+                            properties:
+                              cpu:
+                                anyOf:
+                                - type: integer
+                                - type: string
+                                pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                x-kubernetes-int-or-string: true
+                              ephemeralStorage:
+                                anyOf:
+                                - type: integer
+                                - type: string
+                                pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                x-kubernetes-int-or-string: true
+                              memory:
+                                anyOf:
+                                - type: integer
+                                - type: string
+                                pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                x-kubernetes-int-or-string: true
+                            required:
+                            - cpu
+                            - ephemeralStorage
+                            - memory
+                            type: object
+                        required:
+                        - image
+                        type: object
                       size:
                         format: int32
                         type: integer
@@ -1370,6 +1408,8 @@ spec:
                         type: object
                     required:
                     - k8sNodeFilterName
+                    - maxGpu
+                    - munge
                     - slurmd
                     - volumes
                     type: object

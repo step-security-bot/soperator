@@ -15,23 +15,37 @@ import (
 
 // region PVC template
 
-func RenderVolumeClaimTemplates(componentType consts.ComponentType, cluster *values.SlurmCluster, pvcTemplateSpecs []values.PVCTemplateSpec) []corev1.PersistentVolumeClaim {
+func RenderVolumeClaimTemplates(
+	componentType consts.ComponentType,
+	namespace,
+	clusterName string,
+	pvcTemplateSpecs []values.PVCTemplateSpec,
+) []corev1.PersistentVolumeClaim {
 	var res []corev1.PersistentVolumeClaim
 	for _, template := range pvcTemplateSpecs {
 		if template.Spec == nil {
 			continue
 		}
-		res = append(res, RenderVolumeClaimTemplate(componentType, cluster, template.Name, *template.Spec))
+		res = append(
+			res,
+			renderVolumeClaimTemplate(componentType, namespace, clusterName, template.Name, *template.Spec),
+		)
 	}
 	return res
 }
 
-func RenderVolumeClaimTemplate(componentType consts.ComponentType, cluster *values.SlurmCluster, pvcName string, pvcClaimSpec corev1.PersistentVolumeClaimSpec) corev1.PersistentVolumeClaim {
+func renderVolumeClaimTemplate(
+	componentType consts.ComponentType,
+	namespace,
+	clusterName,
+	pvcName string,
+	pvcClaimSpec corev1.PersistentVolumeClaimSpec,
+) corev1.PersistentVolumeClaim {
 	return corev1.PersistentVolumeClaim{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      pvcName,
-			Namespace: cluster.Namespace,
-			Labels:    RenderLabels(componentType, cluster.Name),
+			Namespace: namespace,
+			Labels:    RenderLabels(componentType, clusterName),
 		},
 		Spec: pvcClaimSpec,
 	}
@@ -42,12 +56,14 @@ func RenderVolumeClaimTemplate(componentType consts.ComponentType, cluster *valu
 // region Slurm configs
 
 // RenderVolumeSlurmConfigs renders [corev1.Volume] containing Slurm config files
-func RenderVolumeSlurmConfigs(cluster *values.SlurmCluster) corev1.Volume {
+func RenderVolumeSlurmConfigs(clusterName string) corev1.Volume {
 	return corev1.Volume{
 		Name: consts.VolumeNameSlurmConfigs,
 		VolumeSource: corev1.VolumeSource{
 			ConfigMap: &corev1.ConfigMapVolumeSource{
-				LocalObjectReference: corev1.LocalObjectReference{Name: cluster.ConfigMapSlurmConfigs.Name},
+				LocalObjectReference: corev1.LocalObjectReference{
+					Name: naming.BuildConfigMapSlurmConfigsName(clusterName),
+				},
 			},
 		},
 	}
@@ -70,16 +86,13 @@ func RenderVolumeNameSpool(componentType consts.ComponentType) string {
 	return fmt.Sprintf("%s-%s", componentType.String(), consts.VolumeNameSpool)
 }
 
-// RenderVolumeSpool renders [corev1.Volume] containing spool contents
-func RenderVolumeSpool(componentType consts.ComponentType, cluster *values.SlurmCluster) corev1.Volume {
-	return corev1.Volume{
-		Name: RenderVolumeNameSpool(componentType),
-		VolumeSource: utils.MustGetBy(
-			cluster.VolumeSources,
-			*cluster.NodeController.VolumeSpool.VolumeSourceName,
-			func(s slurmv1.VolumeSource) string { return s.Name },
-		).VolumeSource,
-	}
+// RenderVolumeSpoolFromSource renders [corev1.Volume] containing spool contents
+func RenderVolumeSpoolFromSource(
+	componentType consts.ComponentType,
+	sources []slurmv1.VolumeSource,
+	sourceName string,
+) corev1.Volume {
+	return renderVolumeFromSource(sources, sourceName, RenderVolumeNameSpool(componentType))
 }
 
 // RenderVolumeMountSpool renders [corev1.VolumeMount] defining the mounting path for spool contents
@@ -94,16 +107,9 @@ func RenderVolumeMountSpool(componentType consts.ComponentType, directory string
 
 // region Jail
 
-// RenderVolumeJail renders [corev1.Volume] containing jail contents
-func RenderVolumeJail(cluster *values.SlurmCluster) corev1.Volume {
-	return corev1.Volume{
-		Name: consts.VolumeNameJail,
-		VolumeSource: utils.MustGetBy(
-			cluster.VolumeSources,
-			*cluster.NodeController.VolumeJail.VolumeSourceName,
-			func(s slurmv1.VolumeSource) string { return s.Name },
-		).VolumeSource,
-	}
+// RenderVolumeJailFromSource renders [corev1.Volume] containing jail contents
+func RenderVolumeJailFromSource(sources []slurmv1.VolumeSource, sourceName string) corev1.Volume {
+	return renderVolumeFromSource(sources, sourceName, consts.VolumeNameJail)
 }
 
 // RenderVolumeMountJail renders [corev1.VolumeMount] defining the mounting path for jail contents
@@ -137,15 +143,15 @@ func RenderVolumeMountMungeSocket() corev1.VolumeMount {
 }
 
 // RenderVolumeMungeKey renders [corev1.Volume] containing munge key file
-func RenderVolumeMungeKey(cluster *values.SlurmCluster) corev1.Volume {
+func RenderVolumeMungeKey(mungeKeySecretName, mungeKeySecretKey string) corev1.Volume {
 	return corev1.Volume{
 		Name: consts.VolumeNameMungeKey,
 		VolumeSource: corev1.VolumeSource{
 			Secret: &corev1.SecretVolumeSource{
-				SecretName: cluster.Secrets.MungeKey.Name,
+				SecretName: mungeKeySecretName,
 				Items: []corev1.KeyToPath{
 					{
-						Key:  cluster.Secrets.MungeKey.Key,
+						Key:  mungeKeySecretKey,
 						Path: consts.SecretMungeKeyFileName,
 						Mode: &consts.SecretMungeKeyFileMode,
 					},
@@ -165,3 +171,14 @@ func RenderVolumeMountMungeKey() corev1.VolumeMount {
 }
 
 // endregion Munge
+
+func renderVolumeFromSource(sources []slurmv1.VolumeSource, sourceName, volumeName string) corev1.Volume {
+	return corev1.Volume{
+		Name: volumeName,
+		VolumeSource: utils.MustGetBy(
+			sources,
+			sourceName,
+			func(s slurmv1.VolumeSource) string { return s.Name },
+		).VolumeSource,
+	}
+}
