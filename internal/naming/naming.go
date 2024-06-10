@@ -47,9 +47,9 @@ func BuildServiceReplicaFQDN(
 	clusterName string,
 	replicaIndex int32,
 ) (replicaName, replicaFQDN string) {
-	serviceName := BuildServiceName(componentType, clusterName)
-	replicaName = fmt.Sprintf("%s-%d", serviceName, replicaIndex)
-	replicaFQDN = fmt.Sprintf("%s.%s.%s.svc.cluster.local", replicaName, serviceName, namespace)
+	stsName := BuildStatefulSetName(componentType, clusterName)
+	replicaName = fmt.Sprintf("%s-%d", stsName, replicaIndex)
+	replicaFQDN = fmt.Sprintf("%s.%s.%s.svc.cluster.local", replicaName, stsName, namespace)
 	return replicaName, replicaFQDN
 }
 
