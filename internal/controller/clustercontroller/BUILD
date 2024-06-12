@@ -20,6 +20,7 @@ go_library(
         "//msp/slurm-service/internal/operator/internal/naming",
         "//msp/slurm-service/internal/operator/internal/render/common",
         "//msp/slurm-service/internal/operator/internal/render/controller",
+        "//msp/slurm-service/internal/operator/internal/render/login",
         "//msp/slurm-service/internal/operator/internal/render/worker",
         "//msp/slurm-service/internal/operator/internal/values",
         "@io_k8s_api//apps/v1:apps",
