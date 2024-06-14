@@ -16,7 +16,7 @@ import (
 )
 
 type hashableStruct interface {
-	*appsv1.StatefulSet | *batchv1.CronJob
+	*appsv1.StatefulSet | *batchv1.CronJob | *batchv1.Job
 }
 
 // generateVersionsAnnotations generates version values for consts.AnnotationVersions for
@@ -37,6 +37,8 @@ func generateVersionsAnnotations[T hashableStruct](s T, pts *corev1.PodTemplateS
 		sType = "sts"
 	case "CronJob":
 		sType = "cj"
+	case "Job":
+		sType = "job"
 	default:
 		return nil, nil, fmt.Errorf("unknown type %q of struct to hash", t)
 	}
@@ -68,6 +70,7 @@ func SetVersions[T hashableStruct](
 	switch t {
 	case "StatefulSet":
 	case "CronJob":
+	case "Job":
 		_ = true
 	default:
 		return fmt.Errorf("unknown type %q of struct to set versions annotation", t)
@@ -95,6 +98,10 @@ func SetVersions[T hashableStruct](
 		ss := any(s).(*batchv1.CronJob)
 		ss.ObjectMeta.Annotations = ensureVersions(ss.ObjectMeta.Annotations, sVersion)
 		ss.Spec.JobTemplate.Spec.Template.ObjectMeta.Annotations = ensureVersions(ss.Spec.JobTemplate.Spec.Template.ObjectMeta.Annotations, ptsVersion)
+	} else {
+		ss := any(s).(*batchv1.Job)
+		ss.ObjectMeta.Annotations = ensureVersions(ss.ObjectMeta.Annotations, sVersion)
+		ss.Spec.Template.ObjectMeta.Annotations = ensureVersions(ss.Spec.Template.ObjectMeta.Annotations, ptsVersion)
 	}
 
 	return nil
