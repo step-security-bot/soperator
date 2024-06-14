@@ -46,6 +46,21 @@ func TestSetVersions(t *testing.T) {
 		assert.Equal(t, "self-pts: \"7555675507055441312\"", s.Spec.JobTemplate.Spec.Template.ObjectMeta.Annotations[consts.AnnotationVersions])
 	})
 
+	t.Run("Test empty Job", func(t *testing.T) {
+		job := batchv1.Job{}
+		pts := corev1.PodTemplateSpec{}
+		job.Spec.Template = pts
+
+		err := common.SetVersions(&job, &pts)
+		assert.NoError(t, err)
+
+		assert.True(t, slices.Contains(maps.Keys(job.ObjectMeta.Annotations), consts.AnnotationVersions))
+		assert.Equal(t, "self-job: \"9084939059461602238\"", job.ObjectMeta.Annotations[consts.AnnotationVersions])
+
+		assert.True(t, slices.Contains(maps.Keys(job.Spec.Template.ObjectMeta.Annotations), consts.AnnotationVersions))
+		assert.Equal(t, "self-pts: \"7555675507055441312\"", job.Spec.Template.ObjectMeta.Annotations[consts.AnnotationVersions])
+	})
+
 	t.Run("Test StatefulSet with existing annotations", func(t *testing.T) {
 		s := appsv1.StatefulSet{
 			ObjectMeta: metav1.ObjectMeta{
@@ -106,5 +121,36 @@ func TestSetVersions(t *testing.T) {
 		assert.True(t, len(maps.Keys(s.Spec.JobTemplate.Spec.Template.ObjectMeta.Annotations)) > 0)
 		assert.Equal(t, "d", s.Spec.JobTemplate.Spec.Template.ObjectMeta.Annotations["c"])
 		assert.Equal(t, "self-pts: \"16512879597073434496\"", s.Spec.JobTemplate.Spec.Template.ObjectMeta.Annotations[consts.AnnotationVersions])
+	})
+
+	t.Run("Test Job with existing annotations", func(t *testing.T) {
+		job := batchv1.Job{
+			ObjectMeta: metav1.ObjectMeta{
+				Annotations: map[string]string{
+					"a": "b",
+				},
+			},
+		}
+		pts := corev1.PodTemplateSpec{
+			ObjectMeta: metav1.ObjectMeta{
+				Annotations: map[string]string{
+					"c": "d",
+				},
+			},
+		}
+		job.Spec.Template = pts
+
+		err := common.SetVersions(&job, &pts)
+		assert.NoError(t, err)
+
+		assert.True(t, slices.Contains(maps.Keys(job.ObjectMeta.Annotations), consts.AnnotationVersions))
+		assert.True(t, len(maps.Keys(job.ObjectMeta.Annotations)) > 0)
+		assert.Equal(t, "b", job.ObjectMeta.Annotations["a"])
+		assert.Equal(t, "self-job: \"10062527149445051880\"", job.ObjectMeta.Annotations[consts.AnnotationVersions])
+
+		assert.True(t, slices.Contains(maps.Keys(job.Spec.Template.ObjectMeta.Annotations), consts.AnnotationVersions))
+		assert.True(t, len(maps.Keys(job.Spec.Template.ObjectMeta.Annotations)) > 0)
+		assert.Equal(t, "d", job.Spec.Template.ObjectMeta.Annotations["c"])
+		assert.Equal(t, "self-pts: \"16512879597073434496\"", job.Spec.Template.ObjectMeta.Annotations[consts.AnnotationVersions])
 	})
 }

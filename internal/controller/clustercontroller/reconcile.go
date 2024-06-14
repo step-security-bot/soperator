@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	appsv1 "k8s.io/api/apps/v1"
+	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/meta"
@@ -30,6 +31,10 @@ import (
 //+kubebuilder:rbac:groups=core,resources=services,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=core,resources=persistentvolumeclaims,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=core,resources=secrets,verbs=get;watch;list
+// +kubebuilder:rbac:groups=batch,resources=jobs,verbs=get;list;watch;create;update;patch;delete
+// +kubebuilder:rbac:groups=batch,resources=jobs/status,verbs=get;update
+// +kubebuilder:rbac:groups=batch,resources=cronjobs,verbs=get;list;watch;create;update;patch;delete
+// +kubebuilder:rbac:groups=batch,resources=cronjobs/status,verbs=get;update
 
 // SlurmClusterReconciler reconciles a SlurmCluster object
 type SlurmClusterReconciler struct {
@@ -114,6 +119,17 @@ func (r *SlurmClusterReconciler) reconcile(ctx context.Context, clusterCR *slurm
 	{
 		initialPhase := slurmv1.PhaseClusterReconciling
 		clusterCR.Status.Phase = &initialPhase
+
+		// Populate Jail
+		res, job, err := r.DeployPopulateJail(ctx, clusterValues, clusterCR)
+		if err != nil {
+			return res, err
+		}
+		// We should wait until job create all needed file in file store
+		res, wait, err := r.CheckPopulateJail(ctx, &job)
+		if err != nil || wait == true {
+			return res, err
+		}
 
 		// Common
 		if res, err := r.DeployCommon(ctx, clusterValues, clusterCR); err != nil {
@@ -207,6 +223,8 @@ func (r *SlurmClusterReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		Owns(&appsv1.StatefulSet{}).
 		Owns(&corev1.PersistentVolumeClaim{}).
 		Owns(&corev1.ConfigMap{}).
+		Owns(&batchv1.Job{}).
+		Owns(&batchv1.CronJob{}).
 		Watches(
 			&corev1.Secret{},
 			handler.EnqueueRequestsFromMapFunc(r.mapObjectsToReconcileRequests),
