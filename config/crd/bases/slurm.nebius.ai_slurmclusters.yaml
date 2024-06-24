@@ -1809,6 +1809,16 @@ spec:
                         required:
                         - image
                         type: object
+                      sshdServiceAnnotations:
+                        additionalProperties:
+                          type: string
+                        description: SshdServiceAnnotations represent K8S annotations
+                          that should be added to the Login node service
+                        type: object
+                      sshdServiceLoadBalancerIP:
+                        description: SshdServiceLoadBalancerIP represents the static
+                          IP address of the LoadBalancer service
+                        type: string
                       sshdServiceType:
                         description: SshdServiceType represents the service type for
                           the SSH daemon
@@ -2071,8 +2081,9 @@ spec:
                           Must correspond to the name of one of [K8sNodeFilter]
                         type: string
                       maxGpu:
-                        description: MaxGPU represents the maximal number of GPUs
-                          available for one worker
+                        description: |-
+                          MaxGPU represents the maximal number of GPUs available for one worker
+                          TODO: Put it to the Slurmd.Resources
                         format: int32
                         type: integer
                       munge:
