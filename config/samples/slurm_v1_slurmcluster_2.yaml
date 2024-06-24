@@ -7,7 +7,7 @@ metadata:
   namespace: slurm-poc
   name: slurm2
 spec:
-  crVersion: 0.1.9
+  crVersion: 0.1.10
   pause: false
   populateJail:
     image: cr.nemax.nebius.cloud/crnonjecps8pifr7am4i/populate_jail:latest
@@ -137,7 +137,6 @@ spec:
     worker:
       size: 2
       k8sNodeFilterName: "gpu"
-      maxGpu: 8
       slurmd:
         image: "cr.nemax.nebius.cloud/crnonjecps8pifr7am4i/worker_slurmd:latest"
         port: 6818
@@ -145,6 +144,7 @@ spec:
           cpu: 156000m
           memory: 1220Gi
           ephemeralStorage: 55Gi
+          nvidia.com/gpu: 8
       munge:
         image: "cr.nemax.nebius.cloud/crnonjecps8pifr7am4i/munge:latest"
         resources:
