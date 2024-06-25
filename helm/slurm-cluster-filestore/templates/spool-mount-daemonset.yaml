@@ -2,15 +2,15 @@ apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   namespace: {{ .Release.Namespace }}
-  name: {{ include "slurm-cluster-storage.volume.spool.mount" . }}
+  name: {{ include "slurm-cluster-filestore.volume.spool.mount" . }}
 spec:
   selector:
     matchLabels:
-      slurm: {{ include "slurm-cluster-storage.volume.spool.mount" . }}
+      slurm: {{ include "slurm-cluster-filestore.volume.spool.mount" . }}
   template:
     metadata:
       labels:
-        slurm: {{ include "slurm-cluster-storage.volume.spool.mount" . }}
+        slurm: {{ include "slurm-cluster-filestore.volume.spool.mount" . }}
     spec:
       initContainers:
         - name: mount-controller-spool-filestore
@@ -50,4 +50,4 @@ spec:
                 - key: nebius.com/node-group-id
                   operator: In
                   values:
-                    - {{ include "slurm-cluster-storage.nodeGroup.nonGpu" . }}
+                    - {{ include "slurm-cluster-filestore.nodeGroup.nonGpu" . }}

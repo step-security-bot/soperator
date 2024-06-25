@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: {{ include "slurm-cluster-storage.volume.spool.pv" . }}
+  name: {{ include "slurm-cluster-filestore.volume.spool.pv" . }}
 spec:
-  storageClassName: {{ include "slurm-cluster-storage.volume.spool.storageClass" . }}
+  storageClassName: {{ include "slurm-cluster-filestore.volume.spool.storageClass" . }}
   volumeMode: Filesystem
   mountOptions:
     - rw
@@ -17,7 +17,7 @@ spec:
     path: /mnt/controller-spool
   claimRef:
     namespace: {{ .Release.Namespace }}
-    name: {{ include "slurm-cluster-storage.volume.spool.pvc" . }}
+    name: {{ include "slurm-cluster-filestore.volume.spool.pvc" . }}
   nodeAffinity:
     required:
       nodeSelectorTerms:
@@ -26,4 +26,4 @@ spec:
             - key: nebius.com/node-group-id
               operator: In
               values:
-                - {{ include "slurm-cluster-storage.nodeGroup.nonGpu" . }}
+                - {{ include "slurm-cluster-filestore.nodeGroup.nonGpu" . }}
