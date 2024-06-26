@@ -189,7 +189,7 @@ func (r *SlurmClusterReconciler) reconcile(ctx context.Context, cluster *slurmv1
 		if err != nil {
 			return ctrl.Result{}, err
 		}
-		// We should wait until job create all needed files in file store
+		// We should wait until job create all needed files in the shared file system
 		res, wait, err := r.CheckPopulateJail(ctx, &job)
 		if err != nil || wait == true {
 			return res, err

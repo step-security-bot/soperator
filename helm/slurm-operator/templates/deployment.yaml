@@ -27,6 +27,8 @@ spec:
         env:
         - name: KUBERNETES_CLUSTER_DOMAIN
           value: {{ quote .Values.kubernetesClusterDomain }}
+        - name: SLURM_OPERATOR_WATCH_NAMESPACES
+          value: {{ quote .Values.watchNamespaces }}
         image: {{ .Values.controllerManager.kubeRbacProxy.image.repository }}:{{ .Values.controllerManager.kubeRbacProxy.image.tag
           | default .Chart.AppVersion }}
         name: kube-rbac-proxy
