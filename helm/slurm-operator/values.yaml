@@ -1,3 +1,5 @@
+watchNamespaces: "*" # Watch all namespaces
+#watchNamespaces: "default,slurm-cluster" # Watch namespaces "default" and "slurm-cluster"
 controllerManager:
   kubeRbacProxy:
     args:
