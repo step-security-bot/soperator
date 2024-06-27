@@ -90,7 +90,7 @@ spec:
       maxGpu: {{ required ".Values.slurmNodes.worker.maxGpu must be provided." .Values.slurmNodes.worker.maxGpu }}
       slurmd:
         image: {{ include "slurm-cluster.image.slurmd" . }}
-        port: {{ default 6817 .Values.slurmNodes.worker.slurmd.port }}
+        port: {{ default 6818 .Values.slurmNodes.worker.slurmd.port }}
         resources:
           cpu: {{ required ".Values.slurmNodes.worker.slurmd.resources.cpu must be provided." .Values.slurmNodes.worker.slurmd.resources.cpu | quote}}
           memory: {{ required ".Values.slurmNodes.worker.slurmd.resources.memory must be provided." .Values.slurmNodes.worker.slurmd.resources.memory | quote}}
