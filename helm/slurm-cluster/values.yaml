@@ -35,13 +35,13 @@ k8sNodeFilters:
 
 # Sources for the volumes used in Slurm node specifications
 volumeSources:
-  - name: spool
+  - name: controller-spool
     persistentVolumeClaim:
-      claimName: "spool"
+      claimName: "controller-spool-pvc"
       readOnly: false
   - name: jail
     persistentVolumeClaim:
-      claimName: "jail"
+      claimName: "jail-pvc"
       readOnly: false
 
 # Secret references needed for Slurm cluster operation
