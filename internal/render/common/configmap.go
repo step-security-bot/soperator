@@ -105,6 +105,9 @@ func generateSlurmConfig(cluster *values.SlurmCluster) renderutils.ConfigFile {
 	res.AddProperty("MaxNodeCount", "512")
 	res.AddProperty("PartitionName", "main Nodes=ALL Default=YES MaxTime=INFINITE State=UP")
 
+	// TODO: Put into appropriate sections
+	res.AddProperty("TaskPlugin", "task/cgroup,task/affinity")
+
 	return res
 }
 
