@@ -31,6 +31,8 @@ tarball in the `terraform-releases/unstable` directory.
 
 It will also unpack the tarball to the same directory, so you can apply it and check your changes.
 
+It will also unpack the tarball to the same directory, so you can apply it and check your changes.
+
 #### Step 3. Create or update Slurm cluster
 Enter the directory with your terraform files:
 ```
@@ -44,8 +46,13 @@ There are some existing sets of variables that can be used for our test clusters
 Initialize & apply your terraform:
 ```
 terraform init
+source ./ncp_auth.sh
 terraform apply
 ```
+
+Wait until it finishes.
+
+Then connect to the created K8S cluster and wait until the `slurm.nebius.ai/SlurmCluster` resource becomes "Available".
 
 #### Step 4. Check release
 Test your changes. The general cluster functionality can be checked in the same way as we suggest it to our architects:
