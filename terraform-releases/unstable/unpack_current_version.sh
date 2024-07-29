@@ -16,3 +16,6 @@ fi
 
 echo "Extracting tarball $tarball"
 tar -xf "${tarball}" --exclude "^terraform/terraform.tfvars$"
+
+echo "Updating slurm_operator_version in the existing terraform.tfvars file"
+sed -i.bak -E "s/(slurm_operator_version[[:space:]]*=[[:space:]]*\").*(\")/\1${version}\2/" terraform/terraform.tfvars
