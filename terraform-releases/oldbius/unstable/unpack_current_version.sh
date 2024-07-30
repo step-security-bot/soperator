@@ -5,7 +5,7 @@ set -e
 # This script unpacks a terraform release tarball with the current VERSION into the working directory excluding the
 # terraform variables file.
 
-version=$(cat < ../../VERSION | tr -d '\n')
+version=$(cat < ../../../VERSION | tr -d '\n')
 version_formatted=$(echo "${version}" | tr '-' '_' | tr '.' '_')
 tarball="slurm_operator_tf_$version_formatted.tar.gz"
 
@@ -17,5 +17,7 @@ fi
 echo "Extracting tarball $tarball"
 tar -xf "${tarball}" --exclude "^terraform/oldbius/terraform.tfvars$"
 
-echo "Updating slurm_operator_version in the existing terraform.tfvars file"
-sed -i.bak -E "s/(slurm_operator_version[[:space:]]*=[[:space:]]*\").*(\")/\1${version}\2/" terraform/oldbius/terraform.tfvars
+if [ -f terraform/oldbius/terraform.tfvars ]; then
+    echo "Updating slurm_operator_version in the existing terraform.tfvars file"
+    sed -i.bak -E "s/(slurm_operator_version[[:space:]]*=[[:space:]]*\").*(\")/\1${version}\2/" terraform/oldbius/terraform.tfvars
+fi
