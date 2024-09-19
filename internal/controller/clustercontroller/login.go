@@ -169,6 +169,7 @@ func (r SlurmClusterReconciler) ReconcileLogin(
 					desired, err := login.RenderStatefulSet(
 						clusterValues.Namespace,
 						clusterValues.Name,
+						clusterValues.ClusterType,
 						clusterValues.NodeFilters,
 						&clusterValues.Secrets,
 						clusterValues.VolumeSources,

@@ -133,8 +133,8 @@ func (r SlurmClusterReconciler) ReconcileWorkers(
 					desired, err := worker.RenderStatefulSet(
 						clusterValues.Namespace,
 						clusterValues.Name,
+						clusterValues.ClusterType,
 						clusterValues.NodeFilters,
-						&clusterValues.Secrets,
 						clusterValues.VolumeSources,
 						&clusterValues.NodeWorker,
 					)
